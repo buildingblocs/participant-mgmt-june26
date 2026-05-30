@@ -28,7 +28,7 @@
     {:else}
         <div class="flex items-center justify-between w-full">
             <p class="text-sm tracking-tight text-blue-100">
-                BuildingBloCS Dec Conf 25
+                BuildingBloCS June Jam 2026
             </p>
         </div>
     {/if}

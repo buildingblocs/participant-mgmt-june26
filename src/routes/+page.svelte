@@ -16,7 +16,7 @@
             </Button>
         </a>
 
-        <a href="/attendance/virtual">
+        <!-- <a href="/attendance/virtual">
             <Button text="GMeet Attendance">
                 <Upload />
             </Button>
@@ -26,7 +26,7 @@
             <Button text="Freebie Collection">
                 <Upload />
             </Button>
-        </a>
+        </a> -->
     </div>
 {:else}
     <div class="flex flex-col mt-10 m-5">

@@ -23,19 +23,11 @@ if (!env.SHEET_INFO) {
 if (!env.SHEET_ENTRY_FREEBIES) {
   throw new Error("SHEET_ENTRY_FREEBIES env var undefined");
 }
-if (!env.SHEET_NAME_VIRTUAL) {
-	throw new Error("SHEET_NAME_VIRTUAL env var undefined");
-}
-if (!env.SHEET_INFO_VIRTUAL) {
-	throw new Error("SHEET_INFO_VIRTUAL env var undefined");
-}
 
 const SHEET_ID = env.SHEET_ID;
 const SHEET_NAME = env.SHEET_NAME;
 const SHEET_INFO = env.SHEET_INFO;
 const SHEET_ENTRY_FREEBIES = env.SHEET_ENTRY_FREEBIES;
-const SHEET_NAME_VIRTUAL = env.SHEET_NAME_VIRTUAL;
-const SHEET_INFO_VIRTUAL = env.SHEET_INFO_VIRTUAL
 
 try {
   const parsedFreebies = JSON.parse(SHEET_ENTRY_FREEBIES);
@@ -58,11 +50,6 @@ export async function get(type: "physical" | "virtual") {
             spreadsheetId: SHEET_ID,
             range: SHEET_NAME + SHEET_INFO,
         });
-    } else if (type == "virtual") {
-        return await sheets.spreadsheets.values.get({
-            spreadsheetId: SHEET_ID,
-            range: SHEET_NAME_VIRTUAL + SHEET_INFO_VIRTUAL,
-        });
     } else {
         return {
             data: null
@@ -81,7 +68,7 @@ export async function update(range: string, value?: string) {
   if (value == null) {
     return await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
-      range,
+      range: SHEET_NAME + range,
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [["TRUE"]],
@@ -90,7 +77,7 @@ export async function update(range: string, value?: string) {
   } else {
     return await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
-      range,
+      range: SHEET_NAME + range,
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [[value]],
@@ -99,17 +86,17 @@ export async function update(range: string, value?: string) {
   }
 }
 
-export async function batchUpdate(ranges: string[]) {
-	const data = ranges.map(r => ({
-		range: `${SHEET_NAME_VIRTUAL}${r}`,
-		values: [["TRUE"]]
-	}));
+// export async function batchUpdate(ranges: string[]) {
+// 	const data = ranges.map(r => ({
+// 		range: `${SHEET_NAME_VIRTUAL}${r}`,
+// 		values: [["TRUE"]]
+// 	}));
 
-	return await sheets.spreadsheets.values.batchUpdate({
-		spreadsheetId: SHEET_ID,
-		resource: {
-			data,
-			valueInputOption: "USER_ENTERED"
-		}
-	})
-}
+// 	return await sheets.spreadsheets.values.batchUpdate({
+// 		spreadsheetId: SHEET_ID,
+// 		resource: {
+// 			data,
+// 			valueInputOption: "USER_ENTERED"
+// 		}
+// 	})
+// }

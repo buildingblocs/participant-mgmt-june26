@@ -32,16 +32,17 @@
                         let entry = "";
                         QRres = [];
                         QRdata = result.data;
+						comment = ""
                         entry = data.ids
                             .slice(1)
-                            .find((entry) => entry[2] === QRdata);
+                            .find((entry) => entry[0] === QRdata);
                         if (entry) {
                             QRres = data.ids.find((entry) => {
-                                return entry && entry[2] === QRdata;
+                                return entry && entry[0] === QRdata;
                             });
                         }
-                        if (QRres && QRres.length > 4 && QRres[4] != null) {
-                            comment = QRres[4];
+                        if (QRres && QRres.length > 2 && QRres[3] != null) {
+                            comment = QRres[3];
                         }
                         scanned = true;
                     }
@@ -100,6 +101,8 @@
 				<Select.Item value="1">Day 1</Select.Item>
 				<Select.Item value="2">Day 2</Select.Item>
 				<Select.Item value="3">Day 3</Select.Item>
+				<Select.Item value="4">Day 4</Select.Item>
+				<Select.Item value="5">Day 5</Select.Item>
 			</Select.Content>
 		</Select.Root>
 		<Select.Root bind:value={camToUse} type="single">
@@ -186,9 +189,7 @@
 						}}
 					>
 						<p>
-							Name: {QRres[0]}
-							<br />
-							Room: {QRres[3]}
+							Name: {QRres[1]}
 							<br />
 							{#if form?.errorMsg}
 								Error: {form?.errorMsg}

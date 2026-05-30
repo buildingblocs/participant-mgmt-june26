@@ -96,7 +96,7 @@
     });
 </script>
 
-<div class="h-full flex flex-col">
+<!-- <div class="h-full flex flex-col">
     <div class="grid grid-cols-2 bg-blue-50 text-black shrink-0">
         <Select.Root type="single" bind:value={item}>
             <Select.Trigger class="selector">{item}</Select.Trigger>
@@ -245,4 +245,6 @@
             </div>
         {/if}
     {/if}
-</div>
+</div> -->
+
+Not in use

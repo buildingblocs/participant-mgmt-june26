@@ -34,7 +34,7 @@ export const actions = {
     }
     // get row num
     const index = result.data.values?.findIndex(
-      (entry) => entry[2] === formData.get("id"),
+      (entry) => entry[0] === formData.get("id"),
     );
 
     if (index === undefined || index === -1) {
@@ -60,7 +60,7 @@ export const actions = {
     if (comment && id) {
       try {
         // get index
-        const index = result.data.values?.findIndex((entry) => entry[2] === id);
+        const index = result.data.values?.findIndex((entry) => entry[0] === id);
 
         if (index === undefined || index === -1) {
           return fail(400, { errorMsg: "ID not in sheet" });
