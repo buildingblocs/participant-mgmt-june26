@@ -43,7 +43,7 @@ export const { handle, signIn, signOut } = SvelteKitAuth({
       return token;
     },
     async session({ session, token }) {
-      session.isOrgMember = token.isOrgMember;
+      session.isOrgMember = token.isOrgMember === true;
       return session;
     },
   },

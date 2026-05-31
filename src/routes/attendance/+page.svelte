@@ -9,11 +9,13 @@
     import { enhance } from "$app/forms";
     import type { PageProps } from "./$types";
 
+    type SheetRow = Array<string | undefined>;
+
     let { data, form }: PageProps = $props();
     let videoElem: HTMLVideoElement;
     let day = $state("1");
     let QRdata = $state("");
-    let QRres = $state([]);
+    let QRres = $state<SheetRow>([]);
     let cameras = $state<QrScanner.Camera[]>([]);
     let camToUse = $state("");
     let camName = $state("Default");
@@ -22,24 +24,31 @@
     let marking = $state(false);
     let commenting = $state(false);
     let comment = $state("");
+    let cameraError = $state("");
+    let scannerRun = $state(0);
 
     $effect(() => {
+        if (scannerRun < 0) {
+            return;
+        }
+
         if (videoElem) {
+            cameraError = "";
             scanner = new QrScanner(
                 videoElem,
                 (result) => {
                     if (!scanned) {
-                        let entry = "";
+                        let entry: SheetRow | undefined;
                         QRres = [];
                         QRdata = result.data;
-						comment = ""
+                        comment = "";
                         entry = data.ids
                             .slice(1)
                             .find((entry) => entry[0] === QRdata);
                         if (entry) {
                             QRres = data.ids.find((entry) => {
                                 return entry && entry[0] === QRdata;
-                            });
+                            }) ?? [];
                         }
                         if (QRres && QRres.length > 2 && QRres[3] != null) {
                             comment = QRres[3];
@@ -71,7 +80,11 @@
                     // commented out as usually [0] is front facing cam
                     // camToUse = cameras[0].id;
                 })
-                .catch((e) => console.error(e));
+                .catch((e) => {
+                    console.error(e);
+                    cameraError =
+                        "Camera unavailable. Check browser permissions and try again.";
+                });
 
             return () => {
                 scanner?.stop();
@@ -91,6 +104,12 @@
             changeCam(camToUse);
         }
     });
+
+    function retryCamera() {
+        cameraError = "";
+        scanned = false;
+        scannerRun += 1;
+    }
 </script>
 
 <div class="h-full flex flex-col">
@@ -108,7 +127,7 @@
 		<Select.Root bind:value={camToUse} type="single">
 			<Select.Trigger class="selector">{camName}</Select.Trigger>
 			<Select.Content>
-				{#each cameras as camera}
+				{#each cameras as camera (camera.id)}
 					<Select.Item value={camera.id}>{camera.label}</Select.Item>
 				{/each}
 			</Select.Content>
@@ -126,6 +145,7 @@
 			<div class="absolute bottom-5 w-full px-5">
 				<div class="bg-blue-100 p-3 rounded-md flex flex-col gap-1">
 					<button
+						type="button"
 						onclick={() => (commenting = false)}
 						class="flex items-center gap-2 text-blue-950"
 					>
@@ -152,6 +172,7 @@
 						<input name="id" type="hidden" value={QRdata} />
 						{#if marking}
 							<button
+								type="submit"
 								class="bg-blue-950 text-blue-50 p-2 flex justify-center items-center gap-3 mt-2 rounded-md font-medium"
 							>
 								Submitting...
@@ -159,6 +180,7 @@
 							</button>
 						{:else}
 							<button
+								type="submit"
 								class="bg-blue-950 text-blue-50 p-2 flex justify-center items-center gap-3 mt-2 rounded-md font-medium"
 							>
 								Submit
@@ -200,6 +222,7 @@
 						<div class="flex gap-3">
 							{#if marking}
 								<button
+									type="submit"
 									class="bg-blue-950 text-blue-50 p-2 flex justify-center items-center gap-3 mt-2 rounded-md font-medium"
 								>
 									Marking...
@@ -207,6 +230,7 @@
 								</button>
 							{:else if form?.errorMsg}
 								<button
+									type="button"
 									onclick={() => ((QRdata = ''), (scanned = false), (form.errorMsg = ''))}
 									class="bg-red-950 text-red-50 p-2 flex justify-center items-center gap-3 mt-2 rounded-md font-medium"
 								>
@@ -215,6 +239,7 @@
 								</button>
 							{:else}
 								<button
+									type="button"
 									onclick={() => (commenting = true)}
 									class="bg-blue-50 text-blue-950 p-2 flex justify-center items-center gap-3 mt-2 rounded-md font-medium outline"
 								>
@@ -222,6 +247,7 @@
 									<Plus size="20" />
 								</button>
 								<button
+									type="submit"
 									class="bg-blue-950 text-blue-50 p-2 flex justify-center items-center gap-3 mt-2 rounded-md font-medium"
 								>
 									Mark Present
@@ -238,6 +264,7 @@
 					<h2 class="text-xl font-semibold text-red-900">Invalid QR Code</h2>
 					<p>Scanning has been paused</p>
 					<button
+						type="button"
 						onclick={() => ((QRdata = ''), (scanned = false))}
 						class="bg-red-950 text-red-50 p-2 flex justify-center items-center gap-3 mt-2 rounded-md font-medium"
 					>
@@ -247,5 +274,20 @@
 				</div>
 			</div>
 		{/if}
+	{:else if cameraError}
+		<div class="absolute bottom-5 w-full px-5">
+			<div class="bg-red-100 p-3 rounded-md">
+				<h2 class="text-xl font-semibold text-red-900">Camera Error</h2>
+				<p>{cameraError}</p>
+				<button
+					type="button"
+					onclick={retryCamera}
+					class="bg-red-950 text-red-50 p-2 flex justify-center items-center gap-3 mt-2 rounded-md font-medium"
+				>
+					Try Again
+					<ArrowRight size="20" />
+				</button>
+			</div>
+		</div>
 	{/if}
 </div>

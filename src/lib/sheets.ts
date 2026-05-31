@@ -29,13 +29,29 @@ const SHEET_NAME = env.SHEET_NAME;
 const SHEET_INFO = env.SHEET_INFO;
 const SHEET_ENTRY_FREEBIES = env.SHEET_ENTRY_FREEBIES;
 
+function columnToNumber(column: string) {
+  return column
+    .toUpperCase()
+    .split("")
+    .reduce((acc, char) => acc * 26 + char.charCodeAt(0) - 64, 0);
+}
+
+function isColumnLetter(value: unknown): value is string {
+  return typeof value === "string" && /^[A-Z]+$/i.test(value);
+}
+
 try {
   const parsedFreebies = JSON.parse(SHEET_ENTRY_FREEBIES);
-  const columnLetters = Object.values(parsedFreebies) as string[];
+  const columnLetters = Object.values(parsedFreebies);
   if (columnLetters.length === 0) {
     throw new Error("Freebies environment variable is empty.");
   }
-  columnLetters.sort();
+  if (!columnLetters.every(isColumnLetter)) {
+    throw new Error(
+      "Freebies environment variable must map to column letters.",
+    );
+  }
+  columnLetters.sort((a, b) => columnToNumber(a) - columnToNumber(b));
   const startColumn = columnLetters[0];
   const endColumn = columnLetters[columnLetters.length - 1];
   SHEET_ENTRY_FREEBIES_RANGE = `${startColumn}:${endColumn}`;
@@ -45,16 +61,16 @@ try {
 }
 
 export async function get(type: "physical" | "virtual") {
-    if (type == "physical") {
-        return await sheets.spreadsheets.values.get({
-            spreadsheetId: SHEET_ID,
-            range: SHEET_NAME + SHEET_INFO,
-        });
-    } else {
-        return {
-            data: null
-        }
-    }
+  if (type == "physical") {
+    return await sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range: SHEET_NAME + SHEET_INFO,
+    });
+  } else {
+    return {
+      data: null,
+    };
+  }
 }
 
 export async function batchGet() {

@@ -4,16 +4,17 @@
     import Header from "$lib/components/header.svelte";
     import favicon from "$lib/assets/favicon.svg";
     import { Skeleton } from "$lib/components/ui/skeleton/index.js";
-    import { page } from "$app/state";  import { beforeNavigate, afterNavigate } from '$app/navigation'
+    import { page } from "$app/state";
+    import { beforeNavigate, afterNavigate } from "$app/navigation";
 
-    let loading = $state(false)
+    let loading = $state(false);
 
-    beforeNavigate((nav) => {
-        loading = true
-    })
+    beforeNavigate(() => {
+        loading = true;
+    });
     afterNavigate(() => {
-        loading = false
-    })
+        loading = false;
+    });
 
     let { children } = $props();
 </script>

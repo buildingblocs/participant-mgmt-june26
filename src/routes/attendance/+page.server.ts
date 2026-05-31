@@ -3,6 +3,7 @@ import type { PageServerLoad } from "./$types";
 import { fail } from "@sveltejs/kit";
 import { get, update } from "$lib/sheets";
 import { env } from "$env/dynamic/private";
+import { requireOrgMember } from "$lib/server/auth";
 
 async function fetchSheetData() {
   const result = await get("physical");
@@ -14,6 +15,7 @@ async function fetchSheetData() {
 
 export const actions = {
   markPresent: async (event) => {
+    await requireOrgMember(event);
     const result = await fetchSheetData();
     const envString = env.SHEET_ENTRY_DAY || "";
 
@@ -51,13 +53,14 @@ export const actions = {
     }
   },
   comment: async (event) => {
+    await requireOrgMember(event);
     const col = env.SHEET_INFO_COMMENT_COL || "";
     const result = await fetchSheetData();
     const formData = await event.request.formData();
-    const comment = formData.get("comment") as string;
+    const comment = formData.get("comment");
     const id = formData.get("id");
 
-    if (comment && id) {
+    if (typeof comment === "string" && id) {
       try {
         // get index
         const index = result.data.values?.findIndex((entry) => entry[0] === id);
@@ -78,10 +81,11 @@ export const actions = {
   },
 } satisfies Actions;
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async (event) => {
+  await requireOrgMember(event);
   const result = await fetchSheetData();
   return {
-    ids: result.data.values,
+    ids: result.data.values ?? [],
     header: {
       heading: "Attendance",
       back: true,

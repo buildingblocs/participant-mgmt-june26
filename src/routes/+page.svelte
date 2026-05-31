@@ -1,16 +1,16 @@
 <script lang="ts">
     import Person from "$lib/components/icons/person.svelte";
-    import Upload from "$lib/components/icons/upload.svelte";
     import ExclamationTriangle from "$lib/components/icons/exclamation-triangle.svelte";
     import type { LayoutProps } from "./$types";
     import Button from "$lib/components/button.svelte";
+    import { resolve } from "$app/paths";
 
     let { data }: LayoutProps = $props();
 </script>
 
-{#if data.session.isOrgMember}
+{#if data.session?.isOrgMember}
     <div class="flex flex-col gap-5 m-5">
-        <a href="/attendance">
+        <a href={resolve("/attendance")}>
             <Button text="Attendance">
                 <Person />
             </Button>
