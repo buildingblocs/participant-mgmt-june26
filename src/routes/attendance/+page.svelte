@@ -50,8 +50,8 @@
                                 return entry && entry[0] === QRdata;
                             }) ?? [];
                         }
-                        if (QRres && QRres.length > 2 && QRres[3] != null) {
-                            comment = QRres[3];
+                        if (QRres && QRres.length > 2 && QRres[4] != null) {
+                            comment = QRres[4];
                         }
                         scanned = true;
                     }
@@ -212,6 +212,8 @@
 					>
 						<p>
 							Name: {QRres[1]}
+							<br />
+							Track: {QRres[3]}
 							<br />
 							{#if form?.errorMsg}
 								Error: {form?.errorMsg}
