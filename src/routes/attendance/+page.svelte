@@ -13,7 +13,7 @@
 
     let { data, form }: PageProps = $props();
     let videoElem: HTMLVideoElement;
-    let day = $state("4");
+    let day = $state("5");
     let QRdata = $state("");
     let QRres = $state<SheetRow>([]);
     let cameras = $state<QrScanner.Camera[]>([]);
